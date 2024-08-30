@@ -1,0 +1,23 @@
+name: Run MATLAB Tests on self-Hosted Runner
+on: [push]
+jobs:
+  my-job:
+    name: Run MATLAB Tests and Generate Artifacts
+    runs-on: self-hosted
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Prepend MATLAB to PATH on Windows (PowerShell)
+        if: runner.os == 'Windows'
+        run: echo "C:\Program Files\MATLAB\R2023b\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Run tests and generate artifacts
+        uses: matlab-actions/run-tests@v2
+        with:
+          test-results-junit: test-results/results.xml
+          test-results-pdf: test-results/results.pdf
+          test-results-simulink-test: test-results/results.mldatx
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
